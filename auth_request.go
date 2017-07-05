@@ -136,6 +136,12 @@ func (ar AuthRequestHandler) sendRequestToBackend(ctx context.Context, req *http
 		backendReq.Header.Set("X-Forwarded-For", clientIP)
 	}
 
+	scheme := "http"
+	if req.TLS != nil {
+		scheme = "https"
+	}
+	backendReq.Header.Set("X-Forwarded-Proto", scheme)
+
 	return http.DefaultTransport.RoundTrip(backendReq)
 }
 
