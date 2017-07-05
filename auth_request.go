@@ -11,6 +11,10 @@ import (
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
 
+const (
+	HeaderName = "X-AUTH-REQUEST"
+)
+
 var hopHeaders = []string{
 	"Connection",
 	"Proxy-Connection",
@@ -47,7 +51,10 @@ func (ar AuthRequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) (
 		return 0, err
 	}
 
-	if res.StatusCode == http.StatusOK {
+	if res.StatusCode == http.StatusOK || res.StatusCode == http.StatusAccepted {
+		if v := res.Header.Get(HeaderName); v != "" {
+			r.Header.Add(HeaderName, v)
+		}
 		return ar.Next.ServeHTTP(w, r)
 	}
 
